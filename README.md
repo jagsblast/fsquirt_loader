@@ -5,3 +5,5 @@ Powershell copy command:
 
 command to compile main.c from kali:
 ```x86_64-w64-mingw32-gcc -shared -Os -s -o bthprops.cpl main.c -luser32 -lwininet```
+
+Tested working against Windows defender, CrowdStrike, SentinelOne 
