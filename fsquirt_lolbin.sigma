@@ -1,0 +1,53 @@
+title: Fsquirt.exe DLL Search Order Hijacking via bthprops.cpl
+id: 6d0e2c9a-7f6e-4c9a-9d1c-3a0d9d2e6f91
+status: experimental
+description: >
+  Detects potential abuse of fsquirt.exe to proxy code execution by
+  loading a malicious bthprops.cpl from a user-writable directory.
+  Fsquirt.exe will load bthprops.cpl from its current working directory,
+  enabling DLL search-order hijacking–style execution.
+references:
+  - https://github.com/jagsblast/fsquirt_loader
+author: JAGSBLAST
+date: 2026-01-13
+tags:
+  - attack.execution
+  - attack.defense_evasion
+  - attack.t1574.002  # DLL Search Order Hijacking
+  - attack.t1218      # Signed Binary Proxy Execution
+  - attack.windows
+logsource:
+  product: windows
+  category: file_event
+
+detection:
+  selection_file_name:
+    TargetFilename|endswith: '\bthprops.cpl'
+
+  selection_suspicious_path:
+    TargetFilename|contains:
+      - '\Users\'
+      - '\ProgramData\'
+      - '\Temp\'
+      - '\AppData\'
+      - '\Downloads\'
+      - '\Desktop\'
+
+  selection_not_system:
+    TargetFilename|not_startswith: 'C:\Windows\System32\'
+
+  filter_legitimate_wsappx:
+    Image|endswith: '\svchost.exe'
+    CommandLine|contains: '-k wsappx'
+
+  condition: selection_file_name
+             and selection_suspicious_path
+             and selection_not_system
+             and not filter_legitimate_wsappx
+
+falsepositives:
+  - Rare legitimate third-party Bluetooth tooling copied outside System32
+  - Manual developer testing of Bluetooth CPLs
+  - Administrative troubleshooting copying system binaries to test directories
+
+level: high
