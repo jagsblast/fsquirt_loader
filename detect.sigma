@@ -1,0 +1,40 @@
+title: Fsquirt.exe DLL Search Order Hijacking via bthprops.cpl
+description: Detects potential abuse of fsquirt.exe to proxy code execution by
+  loading a malicious bthprops.cpl from a non-system directory.
+  Fsquirt.exe will load bthprops.cpl from its current working directory,
+  enabling DLL search-order hijacking–style execution.
+references:
+  - https://github.com/jagsblast/fsquirt_loader
+author: Ben
+date: 2026-01-13
+tags:
+  - attack.execution
+  - attack.defense_evasion
+  - attack.t1574.002 
+  - attack.t1218
+  - attack.windows
+
+logsource:
+  product: windows
+  category: file_event
+
+detection:
+  selection_bthprops:
+    TargetFilename|endswith: '\bthprops.cpl'
+
+  selection_non_system:
+    TargetFilename|not_startswith: 'C:\Windows\System32\'
+
+  filter_legitimate_wsappx:
+    Image|endswith: '\svchost.exe'
+    CommandLine|contains: '-k wsappx'
+
+  condition: selection_bthprops
+             and selection_non_system
+             and not filter_legitimate_wsappx
+
+falsepositives:
+  - Windows updates. 
+
+level: high
+ 
