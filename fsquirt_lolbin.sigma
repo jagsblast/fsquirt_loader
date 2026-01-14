@@ -1,5 +1,4 @@
 title: Fsquirt.exe DLL Search Order Hijacking via bthprops.cpl
-id: 6d0e2c9a-7f6e-4c9a-9d1c-3a0d9d2e6f91
 status: experimental
 description: >
   Detects potential abuse of fsquirt.exe to proxy code execution by
