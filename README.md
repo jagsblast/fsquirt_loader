@@ -28,3 +28,24 @@ weaponized example https://github.com/jagsblast/fsquirt_loader
 ```
 (event.type='File Modification' OR event.type='File Creation') AND tgt.file.name contains 'bthprops.cpl' src.process.cmdline != 'C:\\WINDOWS\\system32\\svchost.exe -k wsappx -p -s AppXSvc'
 ```
+
+KQL hunt
+```
+DeviceFileEvents
+| where ActionType in ("FileCreated", "FileModified")
+| where
+    FileName =~ "bthprops.cpl"
+    or (
+        FileName =~ "fsquirt.exe"
+        and FolderPath !startswith @"C:\Windows\System32"
+    )
+| project
+    DeviceName,
+    ActionType,
+    FolderPath,
+    FileName,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine,
+    SHA256
+| order by TimeGenerated desc
+```
