@@ -47,5 +47,4 @@ DeviceFileEvents
     InitiatingProcessFileName,
     InitiatingProcessCommandLine,
     SHA256
-| order by TimeGenerated desc
 ```
